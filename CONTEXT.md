@@ -31,3 +31,7 @@ going in) / step.
 own exposure; **free-running** starts from the rule's own, as we'd trade it.
 
 **Amplification**: exposure beyond the rule's size in the rule's direction. Astraeus calls it a size tilt.
+
+**Deal**: a grid bot's trade on one coin from flat to flat: an entry, any rungs, the take-profit.
+
+**Ladder**: the resting buy orders a grid bot keeps below its entry; each one is a **rung**.

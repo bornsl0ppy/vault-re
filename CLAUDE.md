@@ -21,3 +21,5 @@ CONTEXT.md. Results: FINDINGS.md.
 5. `python astraeus_test.py NAME`: the pre-registered test of Astraeus's rule
 6. `python backtest.py seen`: engine check; `holdout` was read once on 2026-11-20 and refuses a rerun
 7. `python -m pytest tests`: engine accounting, and stats.py against its reference implementation
+8. Other vaults: `pull.py fills|orders|twaps|details|ledger|vault-funding NAME`, 4h candles per coin into
+   `data/candles_4h/`, then `python fingerprint.py NAME` (what it is) and `python decode_grid.py NAME` (a grid bot's rule)
