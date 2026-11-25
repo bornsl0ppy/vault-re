@@ -21,7 +21,7 @@ pre-registered, and each holdout was read once.
   30-day momentum explain, the alpha (Sharpe 0.64) can't be told from luck once you count the trend rules already
   tried on that history (deflated Sharpe 0.16 at 250 trials, 0.76 even at 5).
 - **On Hyperliquid before the vault existed** (2024-02 to 2025-08) it made +8.9%, all of it on a few days.
-- **The vault's 15 months were the rule's best stretch in eight years.**
+- **The vault's 15 months were the best run the rule's short side ever had** (+44% on short days). By total return, about a third of the rule's 15-month windows did better.
 - **Funding** costs this rule 3-7% a year. A 1x BTC long paid 13% a year on Binance from 2019 and 19% a year on
   Hyperliquid in 2024-25.
 - **Not reproduced:** the article's two-state "1/8 size" tilt and its funding-sign switch.
@@ -30,10 +30,7 @@ pre-registered, and each holdout was read once.
 - **A second vault, Cold Process,** is a DCA grid bot whose ladder decodes cleanly. Run with a rule picking its
   coins, it was wiped out by LUNA in 2022; its record rests on coin picks we couldn't decode (section 6).
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/convexity-dark.png">
-  <img alt="+convexity from August 2025 to November 2026: the vault made 92% flow-neutral and the decoded rule 59% after costs and funding, while BTC fell 47%." src="charts/convexity-light.png">
-</picture>
+![+convexity's rule from 2017 to 2026 against holding BTC: about the same return by the end, with a worst drawdown of -25% against -83%](charts/convexity.png)
 
 ## 1. Rebuilding the vault
 - **Fills:** 4,965 from 2025-08-23 to 2026-11-20. Paging `userFillsByTime` from the newest fill + 1 ms loses fills
@@ -187,20 +184,13 @@ rerun fixed frozen bars on delisted contracts.
 - **The coins carry the result.** From February to October 2026 the grid compounds to +90% on the vault's own
   entries (the vault itself: +166%), and loses 19%, after a 71% drawdown, when a rule picks the coins.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/grid-picks-dark.png">
-  <img alt="Cold Process, February to October 2026: the vault made 166% flow-neutral, the grid replayed on the vault's own entries 90%, and the grid on a rule's picks lost 19% after a 71% drawdown." src="charts/grid-picks-light.png">
-</picture>
 
 - **One crash ends it.** Over 2020-2026 the rule harvests ~0.1% of equity per take-profit, about 16 a day, and
   compounds to absurd numbers through 2021. On 2022-05-10 it holds LUNA at the cap and loses everything within 13
   hours. Holding at the cap does no better; a stop 10% under the average survives but loses 91% that week, and
   every variant that survived went through a 97-99% drawdown.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/grid-crash-dark.png">
-  <img alt="Cold Process's grid as a strategy on Binance minute data, 2020 to 2026: as decoded it compounds to about 6,300x and LUNA ruins it on 2022-05-11; held at the cap it is ruined on 2022-12-19; a stop 10% under the average survives at +4,465% after a 97% drawdown." src="charts/grid-crash-light.png">
-</picture>
+![Cold Process's rule from 2020: up 6,308x, then LUNA took it to zero on 2022-05-11; with a stop 10% under its average it survives at +4,465% after falling 97%](charts/cold-process.png)
 
 So the vault's record is a short-volatility harvest, and its survival rests on how it picks coins and handles
 deep deals, neither of which shows in its fills.

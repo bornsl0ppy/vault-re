@@ -28,4 +28,4 @@ CONTEXT.md. Results: FINDINGS.md.
    delisted included; minute files and funding come on demand, ~10 GB), then `python grid_backtest.py check`
    (the vault's own deals replayed), `fit` (selection rules against its picks), `seen` (the rule over its months);
    `holdout` was read on 2026-11-24 and refuses a rerun
-10. `python charts.py`: the charts in FINDINGS.md and the README, light and dark, from what steps 2-9 saved
+10. `python charts.py`: the two charts in the README, after steps 6 and 9
