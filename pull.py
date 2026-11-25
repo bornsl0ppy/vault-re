@@ -8,6 +8,8 @@ APIs (Hyperliquid info, Binance). Read-only, no keys.
     python pull.py details convexity                     # vaultDetails: leader, followers, history -> data/convexity/details.json
     python pull.py twaps convexity                       # TWAPs, whose slices the fills leave out -> data/convexity/twaps.json
     python pull.py candles BTC 15m 2025-08-01 data/convexity/btc_15m.json            # Hyperliquid
+    python pull.py universe                              # HL perps, delisted included -> data/hl_meta_universe.json
+    python pull.py candles-all 4h 2024-08-01 data/candles_4h   # every perp in the universe, one file per coin
     python pull.py klines spot BTCUSDT 1h 2025-01-01 data/btc/spot_1h.json           # Binance; perp for USDT-M
     python pull.py funding BTCUSDT 2025-01-01 data/btc/funding.json                  # Binance USDT-M prints
     python pull.py hl-funding BTC 2023-05-01 data/btc/hl_funding.json                # Hyperliquid hourly prints
@@ -199,6 +201,19 @@ if __name__ == "__main__":
         data, out = account("userFunding", VAULTS[args[0]], 500), f"data/{args[0]}/funding.json"
     elif kind == "candles":
         data, out = candles(args[0], args[1], dt.datetime.fromtimestamp(ms(args[2]) / 1000, dt.timezone.utc)), args[3]
+    elif kind == "universe":
+        data, out = info({"type": "meta"})["universe"], "data/hl_meta_universe.json"
+    elif kind == "candles-all":
+        interval, since, folder = args
+        start = dt.datetime.fromtimestamp(ms(since) / 1000, dt.timezone.utc)
+        coins = [row["name"] for row in json.load(open("data/hl_meta_universe.json"))]
+        for coin in coins:
+            path = Path(folder) / f"{coin}.json"
+            if not path.exists():
+                path.parent.mkdir(parents=True, exist_ok=True)
+                json.dump(candles(coin, interval, start), open(path, "w"))
+        print(f"{len(coins)} coins -> {folder}", file=sys.stderr)
+        raise SystemExit
     elif kind == "klines":
         market, symbol, interval, since, out = args
         data = binance(KLINES[market], {"symbol": symbol, "interval": interval, "startTime": ms(since)}, lambda r: r[0])

@@ -21,5 +21,11 @@ CONTEXT.md. Results: FINDINGS.md.
 5. `python astraeus_test.py NAME`: the pre-registered test of Astraeus's rule
 6. `python backtest.py seen`: engine check; `holdout` was read once on 2026-11-20 and refuses a rerun
 7. `python -m pytest tests`: engine accounting, and stats.py against its reference implementation
-8. Other vaults: `pull.py fills|orders|twaps|details|ledger|vault-funding NAME`, 4h candles per coin into
-   `data/candles_4h/`, then `python fingerprint.py NAME` (what it is) and `python decode_grid.py NAME` (a grid bot's rule)
+8. Other vaults: `pull.py fills|orders|twaps|details|ledger|vault-funding NAME`, then `pull.py universe` and
+   `pull.py candles-all 4h 2024-08-01 data/candles_4h` (every perp's 4h candles), then `python fingerprint.py NAME`
+   (what it is), `python decode_grid.py NAME` (a grid bot's rule) and `python selection.py NAME` (how it picks coins)
+9. Cold Process's grid on Binance minutes: `python binance_archive.py hourly` (every USDT perp's hourly klines,
+   delisted included; minute files and funding come on demand, ~10 GB), then `python grid_backtest.py check`
+   (the vault's own deals replayed), `fit` (selection rules against its picks), `seen` (the rule over its months);
+   `holdout` was read on 2026-11-24 and refuses a rerun
+10. `python charts.py`: the charts in FINDINGS.md and the README, light and dark, from what steps 2-9 saved

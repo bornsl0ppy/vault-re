@@ -18,25 +18,27 @@ from pull import signed
 HOUR = 3_600_000
 LADDER_WINDOW = 10 * 60_000                   # buy orders placed this soon after an entry belong to its ladder
 
-name = sys.argv[1]
-fills = [f for f in json.load(open(f"data/{name}/fills_ordered.json")) if f["dir"] in ("Open Long", "Close Long")]
-orders = json.load(open(f"data/{name}/orders.json"))
-details = json.load(open(f"data/{name}/details.json"))
-history = dict(details["portfolio"])["allTime"]["accountValueHistory"]
-av_t, av = [t for t, _ in history], [float(v) for _, v in history]
+
+def long_fills(name):
+    return [f for f in json.load(open(f"data/{name}/fills_ordered.json")) if f["dir"] in ("Open Long", "Close Long")]
 
 
-def account_value(t):
+def account_values(details):
     """The vault's account value at t; its first positive one before the history starts counting."""
-    i = bisect.bisect_right(av_t, t) - 1
-    return next(v for v in av[max(i, 0):] if v > 0)
+    history = dict(details["portfolio"])["allTime"]["accountValueHistory"]
+    times, values = [t for t, _ in history], [float(v) for _, v in history]
+
+    def at(t):
+        i = bisect.bisect_right(times, t) - 1
+        return next(v for v in values[max(i, 0):] if v > 0)
+    return at
 
 
 def q(values, p):
     return float(np.percentile(values, p)) if values else float("nan")
 
 
-def ladders():
+def ladders(orders, details):
     """The latest orders: after each entry, the resting buys below it and the take-profit sell above."""
     latest = {}
     for row in orders:
@@ -65,7 +67,7 @@ def ladders():
           ", ".join(f"#{k + 1} {statistics.median(v):.0f} bps" for k, v in sorted(depths.items()) if len(v) >= 5))
 
 
-def trades():
+def trades(fills):
     """Over all fills: from flat to flat per coin, with buys grouped by order."""
     out, open_ = [], {}
     for f in fills:
@@ -94,7 +96,7 @@ def trades():
     return out, list(open_.values())
 
 
-def describe(done, still_open):
+def describe(done, still_open, account_value):
     adds_n = [len(t["buys"]) - 1 for t in done]
     depth, ratio, tp, hours, size_av, pnl = collections.defaultdict(list), [], [], [], [], []
     for t in done:
@@ -136,5 +138,8 @@ def describe(done, still_open):
     print(f"  realized ${sum(pnl):,.0f}; worst trade ${min(pnl):,.0f}, best ${max(pnl):,.0f}")
 
 
-ladders()
-describe(*trades())
+if __name__ == "__main__":
+    name = sys.argv[1]
+    details = json.load(open(f"data/{name}/details.json"))
+    ladders(json.load(open(f"data/{name}/orders.json")), details)
+    describe(*trades(long_fills(name)), account_values(details))
