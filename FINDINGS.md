@@ -1,4 +1,7 @@
-# Findings: decoding +convexity
+# Findings: +convexity and Cold Process
+
+Two Hyperliquid vaults, rebuilt from their public fills and orders and tested as strategies of our own:
++convexity in sections 1-5, Cold Process in section 6.
 
 +convexity is a Hyperliquid vault (`0x5661a070eb13c7c55ac3210b2447d4bea426cbf5`) that trades BTC once a day. We
 rebuilt it from its public fills and orders, then tested whether its rule works as a strategy of its own. Astraeus's
@@ -18,12 +21,16 @@ pre-registered, and each holdout was read once.
   30-day momentum explain, the alpha (Sharpe 0.64) can't be told from luck once you count the trend rules already
   tried on that history (deflated Sharpe 0.16 at 250 trials, 0.76 even at 5).
 - **On Hyperliquid before the vault existed** (2024-02 to 2025-08) it made +8.9%, all of it on a few days.
-- **The vault's 15 months were the rule's best stretch in eight years.**
+- **The vault's 15 months were the best run the rule's short side ever had** (+44% on short days). By total return, about a third of the rule's 15-month windows did better.
 - **Funding** costs this rule 3-7% a year. A 1x BTC long paid 13% a year on Binance from 2019 and 19% a year on
   Hyperliquid in 2024-25.
 - **Not reproduced:** the article's two-state "1/8 size" tilt and its funding-sign switch.
 - **His cross-sectional sleeve reproduces** on our own Binance perp data (Sharpe 1.42 at 2 bps against his 1.56), but
   it's half plain cross-sectional momentum, it lost in 2023-24, and its extra can't be told from luck (section 5).
+- **A second vault, Cold Process,** is a DCA grid bot whose ladder decodes cleanly. Run with a rule picking its
+  coins, it was wiped out by LUNA in 2022; its record rests on coin picks we couldn't decode (section 6).
+
+![+convexity's rule from 2017 to 2026 against holding BTC: about the same return by the end, with a worst drawdown of -25% against -83%](charts/convexity.png)
 
 ## 1. Rebuilding the vault
 - **Fills:** 4,965 from 2025-08-23 to 2026-11-20. Paging `userFillsByTime` from the newest fill + 1 ms loses fills
@@ -151,17 +158,57 @@ position, funding at every settlement. That data and engine aren't in this repo.
 So the sleeve is real enough to reproduce, and only forward data can tell whether its extra over momentum is an
 edge.
 
+## 6. A second vault: Cold Process, a DCA grid
+Cold Process (`0xc3b1bf1f1e6fb8161ef4dc2f34e2c56f70b94b11`) trades Hyperliquid alts long only, one deal at a time:
++193% flow-neutral from February to November 2026, max drawdown -13%, 99.5% of 1,752 deals closed in profit.
+`decode_grid.py` rebuilds its rule from 16,447 fills:
+- An entry of 1.23% of account value, a take-profit 1.34% over the average entry, and resting buys 2.6, 4.1, 5.9,
+  8.0, 11.0, 12.4 and 14.9% under the entry, the first 1.33x the entry and each later one 2.33x the one before.
+  Past about six rungs (~1.25x account value) the position stops growing: it sells pieces under its average while
+  still buying deeper dips, and waits for a bounce.
+- It picks among Hyperliquid's busiest, most volatile coins, but no simple rule reproduces the picks: the best
+  ones name its coin first at 17-21% of deal starts (`selection.py`, `grid_backtest.py fit`).
+
+We backtested the rule as our own strategy on Binance minute data from 2020 to January 2026, delisted coins
+included (`grid_backtest.py`). Pre-registered before pulling the history: one deal at a time, on the most volatile
+over 7 days of the 10 coins with most 24h volume, among every Binance coin until Hyperliquid listed 20 perps
+(2023-05-24) and among Hyperliquid's list at that moment after; at the cap, sell 1/72 of the position at each
+hourly close under the average. Costs from the vault's own fills: 4.5 bps taker on entries and forced sales,
+1.5 bps maker on rungs and take-profits, 10 bps on everything as the stress; Binance funding. Gates as in section
+4, with the alpha taken over holding BTC and over the 10-coin pool, and 1,100 trials counted (a 1,080-cell grid of
+dip-buying rules we had tested on Hyperliquid alts, plus this family). The universe was amended before the holdout
+read, once the first version turned out to pick Binance's fresh pump listings, which the vault never trades. One
+rerun fixed frozen bars on delisted contracts.
+- **The engine reproduces the vault.** Its own 1,616 entries replayed on Binance minutes give the same ladder: 67%
+  of deals close with no add (the vault: 64%), median deal 0.9 h (1.0 h).
+- **The coins carry the result.** From February to October 2026 the grid compounds to +90% on the vault's own
+  entries (the vault itself: +166%), and loses 19%, after a 71% drawdown, when a rule picks the coins.
+
+
+- **One crash ends it.** Over 2020-2026 the rule harvests ~0.1% of equity per take-profit, about 16 a day, and
+  compounds to absurd numbers through 2021. On 2022-05-10 it holds LUNA at the cap and loses everything within 13
+  hours. Holding at the cap does no better; a stop 10% under the average survives but loses 91% that week, and
+  every variant that survived went through a 97-99% drawdown.
+
+![Cold Process's rule from 2020: up 6,308x, then LUNA took it to zero on 2022-05-11; with a stop 10% under its average it survives at +4,465% after falling 97%](charts/cold-process.png)
+
+So the vault's record is a short-volatility harvest, and its survival rests on how it picks coins and handles
+deep deals, neither of which shows in its fills.
+
+Binance's data archive keeps publishing frozen bars for delisted contracts (FTT at 1.59 every minute since
+November 2022): end a coin's life at its last hour with volume.
+
 ## Hyperliquid API notes
 - `userFillsByTime`: 2,000 fills a page, the latest 10,000 kept. Restart each page at its newest millisecond and
   dedupe by `tid`.
 - `historicalOrders`: placement time, `origSz` and `limitPx` for each order; the latest 2,000 rows.
 - `userFunding`: daily buckets stamped at the day's start before 2026-11-13, hourly after.
-- `candleSnapshot`: the last 5,000 candles per interval. BTC's daily candles before 2023-02-26 are backfilled with
-  zero volume.
+- `candleSnapshot`: the last 5,000 candles per interval. Daily candles from before a coin's listing are backfilled
+  with zero volume and zero trades (BTC's before 2023-02-26), so the first candle with trades dates a listing.
 - `fundingHistory` for BTC starts 2023-05-12.
 - A vault's deposit records don't name the depositor. A withdrawal takes `requestedUsd`, commission included, out of
   account value.
 
 ## Reproduce
-`CLAUDE.md` lists the steps. `pull.py` downloads everything from public APIs. The holdout read is guarded:
-`backtest.py holdout` refuses to run twice.
+`CLAUDE.md` lists the steps. `pull.py` and `binance_archive.py` download everything from public sources. The
+holdout reads are guarded: `backtest.py holdout` and `grid_backtest.py holdout` refuse to run twice.

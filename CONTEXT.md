@@ -35,3 +35,9 @@ own exposure; **free-running** starts from the rule's own, as we'd trade it.
 **Deal**: a grid bot's trade on one coin from flat to flat: an entry, any rungs, the take-profit.
 
 **Ladder**: the resting buy orders a grid bot keeps below its entry; each one is a **rung**.
+
+**Cap**: the most a deal's position may cost, 1.25x the equity at its entry (Cold Process stops adding there).
+
+**Deep-deal mode**: what a grid does once a deal sits at its cap. Cold Process sells pieces under its average;
+the backtest tries **unwind** (sell 1/72 of the position at each hourly close under the average), **hold**
+(sell nothing) and **stop** (sell everything 10% under the average).
