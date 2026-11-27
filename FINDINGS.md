@@ -137,6 +137,21 @@ By regime, one continuous book on Binance inputs:
 Hyperliquid, where it cut the return from +13.5% to +5.6% a year. Nearly all of it is paid on long days, so it bites
 in bull markets, which is where the rule makes its money.
 
+### Beyond BTC
+We then ran the frozen rule on other coins, unchanged: c from BTC, each coin's own perp volume, Binance funding,
+5 bps a side. Pre-registered and read once (2026-11-25 and 11-27), decisions 2021-01 to 2025-08 gated, then
+2025-08 to 2026-09 reported (`coins_read.py`, `repick_read.py`).
+- **A fixed list**, picked by 2020 volume so no later knowledge went into it: ETH, SOL and the 8 busiest of 2020
+  (XRP, LINK, BCH, LTC, YFI, EOS, ADA, BNB). As an equal-weight basket: +89%, Sharpe 0.83, worst drawdown -21%,
+  profitable in 7 of 9 half-years. Four of the ten coins lost money; YFI fell 90% at its worst.
+- **The version you'd trade**, the 10 busiest coins re-picked monthly (from 2023-05 only coins Hyperliquid lists),
+  with a top-15 buffer, and a coin that drops out winds its position down instead of being closed on the
+  calendar: +55%, Sharpe 0.64, worst drawdown -19%. Busier coins earned less than the 2020 majors did.
+- **No edge of its own.** Over holding the coins and their 30-day momentum, the fixed list leaves a deflated Sharpe
+  of 0.02. It's trend exposure on alts. What it could add is diversification next to a long book; we judged that
+  against our own live strategy, privately.
+- After the gated period the two went different ways: the fixed list lost 5.8%, the re-picked list made 3.2%.
+
 ## 5. The article's cross-sectional sleeve
 His tradeable version mixes the BTC rule 50/50 with a cross-sectional sleeve: the same score ranks ~625 Binance
 perps, long the top and short the bottom. He reports Sharpe 1.45-1.63, plain and gross, with no funding mentioned.
