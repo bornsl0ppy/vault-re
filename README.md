@@ -35,6 +35,7 @@ Numbers in [FINDINGS.md](FINDINGS.md).
 - `decode_grid.py`, `selection.py`: a grid bot's ladder and take-profit, and how it picks its coins.
 - `binance_archive.py`: Binance's public archive of USDT perps, delisted coins included.
 - `grid_backtest.py`: minute-path engine for the grid, with fees, funding and the pre-registered read.
+- `coins_read.py`, `repick_read.py`: the BTC rule on other coins, a fixed list and a monthly re-picked one.
 - `charts.py`: the two charts above.
 
 Steps in `CLAUDE.md`. Runs on Python with numpy, scipy, requests and matplotlib (`uv run --no-project --with numpy

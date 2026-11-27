@@ -29,3 +29,5 @@ CONTEXT.md. Results: FINDINGS.md.
    (the vault's own deals replayed), `fit` (selection rules against its picks), `seen` (the rule over its months);
    `holdout` was read on 2026-11-24 and refuses a rerun
 10. `python charts.py`: the two charts in the README, after steps 6 and 9
+11. `python coins_read.py check|read` and `python repick_read.py check|read`: the BTC rule on other coins; both
+    reads were done 2026-11-25 and 11-27 and refuse a rerun
